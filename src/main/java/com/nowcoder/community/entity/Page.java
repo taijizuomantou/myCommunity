@@ -4,13 +4,15 @@ package com.nowcoder.community.entity;
  */
 public class Page {
 
-    //当前页码
+    //当前页码。由客户端给出
     private int current = 1;
     //显示的上限
     private int limit = 10;
+
+    //由服务器给出
     //数据的总数(用于计算总页数）
     private int rows;
-    //查询路径（用于复用分页的链接）
+    //查询路径（用于复用分页的链接）作为基础路径
     private String path;
 
     public int getCurrent() {
