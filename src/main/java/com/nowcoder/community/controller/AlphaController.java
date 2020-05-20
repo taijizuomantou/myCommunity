@@ -1,6 +1,7 @@
 package com.nowcoder.community.controller;
 
 import com.nowcoder.community.service.AlphaService;
+import com.nowcoder.community.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -8,8 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -143,5 +146,49 @@ public class AlphaController {
         list.add(emp);
         return list;
     }
+
+    //cookie示例.存在头部
+
+    @RequestMapping(path="/cookie/set",method = RequestMethod.GET)
+    @ResponseBody
+    public String setCookie(HttpServletResponse response){
+        Cookie cookie =new Cookie("code", CommunityUtil.generateUUID());//每个cookie对象只能存一对name value
+        //设置cookie生效的范围。有些请求不需要cookie
+        //cookie.setPath("/community");//在整个项目下都有效
+        cookie.setPath("/community/alpha");//只在alpha路径下有效
+        //默认情况下浏览器的内存关掉时cookie消失。
+        //设置cookie的生效时间，会存在硬盘里长期有效，直到超时
+        cookie.setMaxAge(60*10);//单位是秒 10min
+        //发送cookie把cookie放在response的头部
+        response.addCookie(cookie);
+        return "set cookie";
+    }
+
+    @RequestMapping(path="/cookie/get",method = RequestMethod.GET)
+    @ResponseBody
+    public String getCookie(@CookieValue("code")String code){
+        System.out.println(code);
+        return "get cookie";
+    }
+
+    //session示例
+    @RequestMapping(path="/session/set",method = RequestMethod.GET)
+    @ResponseBody
+    public String setSession(HttpSession session){//自动注入
+        session.setAttribute("id",1);
+        session.setAttribute("name","Test");
+        return "set session";
+    }
+
+    @RequestMapping(path="/session/get",method = RequestMethod.GET)
+    @ResponseBody
+    public String getSession(HttpSession session){
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+
+        return "get session";
+    }
+
+
 
 }

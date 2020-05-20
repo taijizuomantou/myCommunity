@@ -10,7 +10,7 @@ public class CommunityUtil
 
     //生成随机字符串，可用于激活码，上传文件、头像的名字
     public static String generateUUID(){
-        return UUID.randomUUID().toString().replaceAll("-"," ");//去掉其中的-
+        return UUID.randomUUID().toString().replaceAll("-","");//去掉其中的-
     }
 
     //MD5加密
