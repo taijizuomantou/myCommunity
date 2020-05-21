@@ -14,4 +14,6 @@ public interface DiscussPostMapper {
     //@Param 可以给参数写别名。当需要动态的拼sql<if>且参数只有一个时必须取别名
     int selectDiscussPostRows(@Param("userId")int userId);
 
+    int insertDiscussPost(DiscussPost discussPost);
+
 }
