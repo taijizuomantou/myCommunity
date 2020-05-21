@@ -1,5 +1,6 @@
 package com.nowcoder.community.controller;
 
+import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityUtil;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/user")
@@ -40,11 +42,13 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @RequestMapping(path="/setting", method = RequestMethod.GET)
     public String getSettingPage(){
         return "/site/setting";
     }
 
+    @LoginRequired
     @RequestMapping(path="/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model){
         if(headerImage == null){
@@ -104,4 +108,17 @@ public class UserController {
         }
     }
 
+    @LoginRequired
+    @RequestMapping(path="/update", method = RequestMethod.POST)
+    public String updatePassword(Model model, String oldPassword, String newPassword){
+        User user = hostHolder.getUser();
+        int userId = user.getId();
+        Map<String,Object> map = userService.updatePassword(userId,oldPassword,newPassword);
+        if(map != null){
+            model.addAttribute("oldPasswordMsg",map.get("oldPasswordMsg"));
+            model.addAttribute("newPasswordMsg",map.get("newPasswordMsg"));
+            return "/site/setting";
+        }
+        return "redirect:/index";
+    }
 }
