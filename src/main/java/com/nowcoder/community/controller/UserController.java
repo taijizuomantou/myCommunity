@@ -50,7 +50,7 @@ public class UserController {
 
     @LoginRequired
     @RequestMapping(path="/upload", method = RequestMethod.POST)
-    public String uploadHeader(MultipartFile headerImage, Model model){
+    public String uploadHeader(MultipartFile headerImage, Model model){//因为MulitipartFile在表现层
         if(headerImage == null){
             model.addAttribute("error","您还没有选择图片");
             return "/site/setting";
