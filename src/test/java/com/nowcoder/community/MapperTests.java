@@ -67,8 +67,9 @@ public class MapperTests {
     }
     @Test
     public void changePassword(){
-        String temp = "123456" + userMapper.selectById(153).getSalt();
-        int rows = userMapper.updatePassword(153, CommunityUtil.md5(temp));
+        User user = userMapper.selectByName("niuke");
+        String temp = "123456" + user.getSalt();
+        int rows = userMapper.updatePassword(user.getId(), CommunityUtil.md5(temp));
         System.out.println(rows);
     }
     @Test
