@@ -9,7 +9,7 @@ public class Message {
     private int toId;
     private String conversationId;
     private String content;
-    private int stauts;
+    private int status;
     private Date createTime;
 
     public int getId() {
@@ -52,12 +52,12 @@ public class Message {
         this.content = content;
     }
 
-    public int getStauts() {
-        return stauts;
+    public int getStatus() {
+        return status;
     }
 
-    public void setStauts(int stauts) {
-        this.stauts = stauts;
+    public void setStatus(int stauts) {
+        this.status = stauts;
     }
 
     public Date getCreateTime() {
@@ -76,7 +76,7 @@ public class Message {
                 ", toId=" + toId +
                 ", conversationId='" + conversationId + '\'' +
                 ", content='" + content + '\'' +
-                ", stauts=" + stauts +
+                ", stauts=" + status +
                 ", createTime=" + createTime +
                 '}';
     }
