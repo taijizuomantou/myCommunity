@@ -6,6 +6,9 @@ import org.apache.ibatis.annotations.*;
 //也可以用注解而不是xml文件.也可以写if,但必须套用script标签
 //这种方式少些了一个xml文件，阅读更麻烦
 @Mapper
+//这个组件不推荐使用了
+@Deprecated
+
 public interface LoginTicketMapper {
 
     @Insert({
