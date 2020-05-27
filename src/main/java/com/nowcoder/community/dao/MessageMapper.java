@@ -41,6 +41,4 @@ public interface MessageMapper {
     //查询某个主题所包含的所有通知 要包含分页
     List<Message> selectNotices(int userId, String topic, int offset, int limit);
 
-    //
-
 }
