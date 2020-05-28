@@ -1,10 +1,8 @@
-package com.nowcoder.community;
+package com.nowcoder.community.service;
 
-import com.nowcoder.community.dao.DiscussPostMapper;
 import com.nowcoder.community.dao.elasticsearch.DiscussPostRepository;
 import com.nowcoder.community.entity.DiscussPost;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -12,10 +10,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,24 +18,16 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchResultMapper;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.stereotype.Service;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = CommunityApplication.class)//设置与main包中相同的配置类
-public class ElasticsearchTests {
-
-    @Autowired
-    private DiscussPostMapper discussMapper;
+@Service
+public class ElasticsearchService {
 
     @Autowired
     private DiscussPostRepository discussRepository;
@@ -48,81 +35,27 @@ public class ElasticsearchTests {
     @Autowired
     private ElasticsearchTemplate elasticTemplate;
 
-    @Test
-    public void testInsert(){
-        discussRepository.save(discussMapper.seletctDiscussPostById(241));
-        discussRepository.save(discussMapper.seletctDiscussPostById(242));
-        discussRepository.save(discussMapper.seletctDiscussPostById(243));
-
-    }
-
-    @Test
-    public void testInsertList(){
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(101,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(102,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(103,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(111,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(112,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(131,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(132,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(133,0,100));
-        discussRepository.saveAll(discussMapper.selectDiscussPosts(134,0,100));
-
-    }
-
-    @Test
-    public void testUpdate(){
-        DiscussPost post = discussMapper.seletctDiscussPostById(231);
-        post.setContent("我是新人，使劲灌水");
+    public void saveDiscussPost(DiscussPost post){
         discussRepository.save(post);
     }
 
-    @Test
-    public void testDelete(){
-        //discussRepository.deleteById(231);
-        discussRepository.deleteAll();
+    public void deleteDiscussPost(int id){
+        discussRepository.deleteById(id);
     }
 
-    //elasticsearch可以通过对关键词前后增加标签来对关键词进行高亮等不同的显示样式
-    //需要知道关键词，排序方式，分页显示和关键词高亮
-    @Test
-    public void testSearchByRepository(){
+    public Page<DiscussPost> searchDIscussPost(String keyword, int current, int limit){//表示当前是第几页
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.multiMatchQuery("互联网寒冬","title","content"))//多个字段同时匹配
+                .withQuery(QueryBuilders.multiMatchQuery(keyword,"title","content"))//多个字段同时匹配
                 .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
                 .withSort(SortBuilders.fieldSort("score").order(SortOrder.DESC))
                 .withSort(SortBuilders.fieldSort("createTime").order(SortOrder.DESC))
-                .withPageable(PageRequest.of(0,10))//第一个参数是第几页，第二个参数是显示几条数据
+                .withPageable(PageRequest.of(current,limit))//第一个参数是第几页，第二个参数是显示几条数据
                 .withHighlightFields(
                         new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
                         new HighlightBuilder.Field("content").preTags("<em>").postTags("</em>")
+                        //在global.css中已经设置<em>为红色了
                 ).build();
-
-        //repository底层查到的数据应由mapper进行处理，但它没处理。
-        //底层获取到了高亮显示的值，但没有返回。可以直接用template的方法避免这个问题
-        Page<DiscussPost> page = discussRepository.search(searchQuery);
-        System.out.println(page.getTotalElements());
-        System.out.println(page.getTotalPages());
-        System.out.println(page.getNumber());
-        System.out.println(page.getSize());
-        for(DiscussPost post:page){
-            System.out.println(post);
-        }
-    }
-
-    @Test
-    public void testSearchByTemplate(){
-        SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.multiMatchQuery("互联网寒冬","title","content"))//多个字段同时匹配
-                .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
-                .withSort(SortBuilders.fieldSort("score").order(SortOrder.DESC))
-                .withSort(SortBuilders.fieldSort("createTime").order(SortOrder.DESC))
-                .withPageable(PageRequest.of(0,10))//第一个参数是第几页，第二个参数是显示几条数据
-                .withHighlightFields(
-                        new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
-                        new HighlightBuilder.Field("content").preTags("<em>").postTags("</em>")
-                ).build();
-        Page<DiscussPost>page = elasticTemplate.queryForPage(searchQuery, DiscussPost.class, new SearchResultMapper() {
+        return elasticTemplate.queryForPage(searchQuery, DiscussPost.class, new SearchResultMapper() {
             @Override
             public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> aClass, Pageable pageable) {
                 SearchHits hits = response.getHits();
@@ -170,14 +103,8 @@ public class ElasticsearchTests {
                         hits.getTotalHits(), response.getAggregations(), response.getScrollId(), hits.getMaxScore());
             }
         });
-        System.out.println(page.getTotalElements());
-        System.out.println(page.getTotalPages());
-        System.out.println(page.getNumber());
-        System.out.println(page.getSize());
-        for(DiscussPost post:page){
-            System.out.println(post);
-        }
     }
+
 }
 
 
