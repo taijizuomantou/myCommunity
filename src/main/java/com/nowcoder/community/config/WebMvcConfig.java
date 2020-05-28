@@ -18,8 +18,8 @@ public class WebMvcConfig implements WebMvcConfigurer {//一定要实现的接�
     @Autowired
     private LoginTicketInterceptro loginTicketInterceptro;
 
-    @Autowired
-    private LoginRequiredInterceptor loginRequiredInterceptor;
+//    @Autowired
+//    private LoginRequiredInterceptor loginRequiredInterceptor;
 
     @Autowired
     private MessageInterceptor messageInterceptor;
@@ -33,8 +33,9 @@ public class WebMvcConfig implements WebMvcConfigurer {//一定要实现的接�
         registry.addInterceptor(loginTicketInterceptro)    //这个拦截器会拦截一切请求
                 .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");//静态资源随便访问
 
-        registry.addInterceptor(loginRequiredInterceptor)    //这个拦截器会拦截一切请求
-                .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");//静态资源随便访问
+//        registry.addInterceptor(loginRequiredInterceptor)    //这个拦截器会拦截一切请求
+//                .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");//静态资源随便访问
+
         registry.addInterceptor(messageInterceptor)    //这个拦截器会拦截一切请求
                 .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");//静态资源随便访问
 
