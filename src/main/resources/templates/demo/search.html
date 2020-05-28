@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"><!-- 模板的语法来源于thymeleaf官网 -->
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form class="form-inline my-2 my-lg-0" method="get" th:action="@{/alpha/search}">
+    <input class="form-control mr-sm-2" type="search" aria-label="Search"  name="keyword" th:value="${keyword}"/>
+    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">搜索</button>
+</form>
+</body>
+</html>

@@ -198,4 +198,10 @@ public class AlphaController {
         return CommunityUtil.getJSONString(0,"操作成功");
     }
 
+    @RequestMapping(path="search", method = RequestMethod.GET)
+    public String search(String keyword, Model model) {
+        System.out.println(keyword);
+        return "/demo/search";
+    }
+
 }
