@@ -1,9 +1,6 @@
 package com.nowcoder.community.config;
 
-import com.nowcoder.community.controller.interceptor.AlphaInterceptor;
-import com.nowcoder.community.controller.interceptor.LoginRequiredInterceptor;
-import com.nowcoder.community.controller.interceptor.LoginTicketInterceptro;
-import com.nowcoder.community.controller.interceptor.MessageInterceptor;
+import com.nowcoder.community.controller.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -24,6 +21,9 @@ public class WebMvcConfig implements WebMvcConfigurer {//一定要实现的接�
     @Autowired
     private MessageInterceptor messageInterceptor;
 
+    @Autowired
+    private DataInterceptor dataInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(alphaInterceptor)    //这个拦截器会拦截一切请求
@@ -38,6 +38,7 @@ public class WebMvcConfig implements WebMvcConfigurer {//一定要实现的接�
 
         registry.addInterceptor(messageInterceptor)    //这个拦截器会拦截一切请求
                 .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");//静态资源随便访问
-
+        registry.addInterceptor(dataInterceptor)    //这个拦截器会拦截一切请求
+                .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");//静态资源随便访问
     }
 }
