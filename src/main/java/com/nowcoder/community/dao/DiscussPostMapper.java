@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface DiscussPostMapper {
 
-    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit);//当userid != 0时我发布的帖子。0不挑userid。动态sql
+    List<DiscussPost> selectDiscussPosts(int userId, int offset, int limit, int orderMode);//当userid != 0时我发布的帖子。0不挑userid。动态sql
 
     //@Param 可以给参数写别名。当需要动态的拼sql<if>且参数只有一个时必须取别名
     int selectDiscussPostRows(@Param("userId")int userId);
@@ -23,5 +23,8 @@ public interface DiscussPostMapper {
     int updateType(int id, int type);
 
     int updateStatus(int id, int status);
+
+    int updateScore(int id, double score);
+
 
 }
