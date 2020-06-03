@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <link rel="stylesheet" th:href="@{/css/letter.css}" />
+    <title>牛客网-私信列表</title>
+</head>
+<body>
+<input id="fileSelector" type="file" name="filename">
+<button type="button" class="btn btn-primary" id="sendBtn" onclick="test()">发送</button>
+<script th:src="@{/js/cos-js-sdk-v5.min.js}"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script th:src="@{/js/global.js}"></script>
+<!--<script th:src="@{/js/testAjax.js}"></script>-->
+</body>
+</html>
+<script>
+function test() {
+                var Bucket = 'community-header-1252397182';
+                var Region = 'ap-nanjing';     /* 存储桶所在地域，必须字段 */
+	 	     var selectedFile = document.getElementById('fileSelector').files[0];
+                // 初始化实例
+                var cos = new COS({
+                    getAuthorization: function (options, callback) {
+                        // 异步获取临时密钥
+                        $.get('/community/alpha/testGet', {
+                        }, function (data) {
+                        data = $.parseJSON(data)
+                            var credentials = data && data.credentials;
+                            if (!data || !credentials) return console.error('credentials invalid');
+                            callback({
+                                TmpSecretId: credentials.tmpSecretId,
+                                TmpSecretKey: credentials.tmpSecretKey,
+                                XCosSecurityToken: credentials.sessionToken,
+                                // 建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
+                                StartTime: data.startTime, // 时间戳，单位秒，如：1580000000
+                                ExpiredTime: data.expiredTime, // 时间戳，单位秒，如：1580000900
+                            });
+                        });
+                    }
+                });
+                cos.putObject({
+                Bucket: 'community-header-1252397182', /* 必须 */
+                Region: 'ap-nanjing',     /* 存储桶所在地域，必须字段 */
+                Key: 'test2',              /* 必须 */
+                StorageClass: 'STANDARD',
+                Body: selectedFile, // 上传文件对象
+                onProgress: function(progressData) {
+                    console.log(JSON.stringify(progressData));
+                }
+            }, function(err, data) {
+                console.log(err || data);
+            });
+
+}
+
+</script>
