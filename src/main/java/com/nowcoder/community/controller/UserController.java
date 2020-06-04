@@ -82,17 +82,17 @@ public class UserController implements CommunityConstant {
 
         try {
             // 替换为您的 SecretId
-            config.put("SecretId", "AKIDf7KUTDL6i41i14aPjpgZCbkjCOM3GaQv");
+            config.put("SecretId", accessKey);
             // 替换为您的 SecretKey
-            config.put("SecretKey", "LQGrVq5Awb0A6qJhwyvnZ8RULxJCrGSs");
+            config.put("SecretKey", secretKey);
 
             // 临时密钥有效时长，单位是秒，默认1800秒，最长可设定有效期为7200秒
             config.put("durationSeconds", 1800);
 
             // 换成您的 bucket
-            config.put("bucket", "community-header-1252397182");
+            config.put("bucket", headerBucketName);
             // 换成 bucket 所在地区
-            config.put("region", "ap-nanjing");
+            config.put("region", headerBucketRegion);
 
             // 这里改成允许的路径前缀，可以根据自己网站的用户登录态判断允许上传的具体路径，例子：a.jpg 或者 a/* 或者 * 。
             // 如果填写了“*”，将允许用户访问所有资源；除非业务需要，否则请按照最小权限原则授予用户相应的访问权限范围。
@@ -102,16 +102,12 @@ public class UserController implements CommunityConstant {
             String[] allowActions = new String[] {
                     // 简单上传
                     "name/cos:PutObject",
-                    // 表单上传、小程序上传
-                    "name/cos:PostObject",
             };
             config.put("allowActions", allowActions);
 
             JSONObject credential = CosStsClient.getCredential(config);
             //成功返回临时密钥信息，如下打印密钥信息
             System.out.println(credential);
-            credential.put("bucket","community-header-1252397182");
-            credential.put("region","ap-nanjing");
             return credential.toString(4);
         } catch (Exception e) {
             //失败抛出异常
