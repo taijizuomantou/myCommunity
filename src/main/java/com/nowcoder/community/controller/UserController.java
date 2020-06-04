@@ -8,12 +8,6 @@ import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
-import com.qcloud.cos.COSClient;
-import com.qcloud.cos.ClientConfig;
-import com.qcloud.cos.auth.BasicCOSCredentials;
-import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.region.Region;
-import com.sun.tracing.dtrace.ArgsAttributes;
 import com.tencent.cloud.CosStsClient;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -73,7 +67,6 @@ public class UserController implements CommunityConstant {
     @Value("${tencent.bucket.header.url}")
     private String headerBucketUrl;
 
-    private COSClient cosClient;
     @GetMapping("/getTempTencetnAuth")
     @ResponseBody
     public String testGet(){
