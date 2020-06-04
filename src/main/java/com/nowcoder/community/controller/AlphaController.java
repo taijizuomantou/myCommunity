@@ -248,13 +248,14 @@ public class AlphaController {
             JSONObject credential = CosStsClient.getCredential(config);
             //成功返回临时密钥信息，如下打印密钥信息
             System.out.println(credential);
+            credential.put("bucket","community-header-1252397182");
+            credential.put("region","ap-nanjing");
             return credential.toString(4);
         } catch (Exception e) {
             //失败抛出异常
             e.printStackTrace();
             throw new IllegalArgumentException("no valid secret !");
         }
-
     }
 
 }

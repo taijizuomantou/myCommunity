@@ -8,23 +8,28 @@ import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
+import com.qcloud.cos.COSClient;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.region.Region;
 import com.sun.tracing.dtrace.ArgsAttributes;
+import com.tencent.cloud.CosStsClient;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Controller
 @RequestMapping("/user")
@@ -53,12 +58,95 @@ public class UserController implements CommunityConstant {
     @Autowired
     private FollowService followService;
 
+    @Value("${tencent.key.access}")
+    private String accessKey;
+
+    @Value("${tencent.key.secret}")
+    private String secretKey;
+
+    @Value("${tencent.bucket.header.name}")
+    private String headerBucketName;
+
+    @Value("${tencent.bucket.header.region}")
+    private String headerBucketRegion;
+
+    @Value("${tencent.bucket.header.url}")
+    private String headerBucketUrl;
+
+    private COSClient cosClient;
+    @GetMapping("/getTempTencetnAuth")
+    @ResponseBody
+    public String testGet(){
+        JSONObject resultJson = new JSONObject();
+        TreeMap<String, Object> config = new TreeMap<String, Object>();
+
+        try {
+            // 替换为您的 SecretId
+            config.put("SecretId", "AKIDf7KUTDL6i41i14aPjpgZCbkjCOM3GaQv");
+            // 替换为您的 SecretKey
+            config.put("SecretKey", "LQGrVq5Awb0A6qJhwyvnZ8RULxJCrGSs");
+
+            // 临时密钥有效时长，单位是秒，默认1800秒，最长可设定有效期为7200秒
+            config.put("durationSeconds", 1800);
+
+            // 换成您的 bucket
+            config.put("bucket", "community-header-1252397182");
+            // 换成 bucket 所在地区
+            config.put("region", "ap-nanjing");
+
+            // 这里改成允许的路径前缀，可以根据自己网站的用户登录态判断允许上传的具体路径，例子：a.jpg 或者 a/* 或者 * 。
+            // 如果填写了“*”，将允许用户访问所有资源；除非业务需要，否则请按照最小权限原则授予用户相应的访问权限范围。
+            config.put("allowPrefix", "*");
+
+            // 密钥的权限列表。简单上传、表单上传和分片上传需要以下的权限，其他权限列表请看 https://cloud.tencent.com/document/product/436/31923
+            String[] allowActions = new String[] {
+                    // 简单上传
+                    "name/cos:PutObject",
+                    // 表单上传、小程序上传
+                    "name/cos:PostObject",
+            };
+            config.put("allowActions", allowActions);
+
+            JSONObject credential = CosStsClient.getCredential(config);
+            //成功返回临时密钥信息，如下打印密钥信息
+            System.out.println(credential);
+            credential.put("bucket","community-header-1252397182");
+            credential.put("region","ap-nanjing");
+            return credential.toString(4);
+        } catch (Exception e) {
+            //失败抛出异常
+            e.printStackTrace();
+            throw new IllegalArgumentException("no valid secret !");
+        }
+    }
+
+
     @LoginRequired
     @RequestMapping(path="/setting", method = RequestMethod.GET)
-    public String getSettingPage(){
+    public String getSettingPage(Model model){
+        //上传文件名称
+        String fileName = CommunityUtil.generateUUID();
+
+        model.addAttribute("fileName",fileName);
+        model.addAttribute("bucket",headerBucketName);
+        model.addAttribute("region",headerBucketRegion);
+
         return "/site/setting";
     }
 
+    //更新头像路径
+    @RequestMapping(path="/header/url", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateHeaderUrl(String fileName){
+        if(StringUtils.isBlank(fileName)){
+            return CommunityUtil.getJSONString(1,"文件名不能为空");
+        }
+        String url = headerBucketUrl + "/" + fileName;
+        userService.updateHeader(hostHolder.getUser().getId(), url);
+        return CommunityUtil.getJSONString(0);
+    }
+
+    //废弃
     @LoginRequired
     @RequestMapping(path="/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model){//因为MulitipartFile在表现层
@@ -95,6 +183,7 @@ public class UserController implements CommunityConstant {
         return "redirect:/index";
     }
 
+    //废弃
     @RequestMapping(path="/header/{fileName}",method = RequestMethod.GET)
     public void getHeader(@PathVariable("fileName")String fileName, HttpServletResponse response){
         //服务器存放的路径

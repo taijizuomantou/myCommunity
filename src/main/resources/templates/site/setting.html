@@ -65,15 +65,41 @@
 			<div class="container p-5 mt-3 mb-3">
 				<!-- 上传头像 -->
 				<h6 class="text-left text-info border-bottom pb-2">上传头像</h6>
-				<form class="mt-5" method="post" enctype="multipart/form-data" th:action="@{/user/upload}">
+<!--				上传到本地-->
+<!--				<form class="mt-5" method="post" enctype="multipart/form-data" th:action="@{/user/upload}">-->
+<!--					<div class="form-group row mt-4">-->
+<!--						<label for="head-image" class="col-sm-2 col-form-label text-right">选择头像:</label>-->
+<!--						<div class="col-sm-10">-->
+<!--							<div class="custom-file">-->
+<!--								<input type="file" th:class="|custom-file-input ${error!=null?'is-invalid':''}|"-->
+<!--									   id="head-image" name = "headerImage" lang="es" required="">-->
+<!--								<label class="custom-file-label" for="head-image" data-browse="文件">选择一张图片</label>-->
+<!--								<div class="invalid-feedback" th:text="${error}">-->
+<!--									该账号不存在!-->
+<!--								</div>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="form-group row mt-4">-->
+<!--						<div class="col-sm-2"></div>-->
+<!--						<div class="col-sm-10 text-center">-->
+<!--							<button type="submit" class="btn btn-info text-white form-control" onclick="test();">立即上传</button>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</form>-->
+<!--				上传到腾讯云-->
+				<form class="mt-5" id="uploadForm">
 					<div class="form-group row mt-4">
 						<label for="head-image" class="col-sm-2 col-form-label text-right">选择头像:</label>
 						<div class="col-sm-10">
 							<div class="custom-file">
-								<input type="file" th:class="|custom-file-input ${error!=null?'is-invalid':''}|"
+								<input type="hidden" id="bucket" th:value="${bucket}">
+								<input type="hidden" id="region" th:value="${region}">
+								<input type="hidden" id="key" th:value="${fileName}">
+								<input type="file" class="custom-file-input"
 									   id="head-image" name = "headerImage" lang="es" required="">
 								<label class="custom-file-label" for="head-image" data-browse="文件">选择一张图片</label>
-								<div class="invalid-feedback" th:text="${error}">
+								<div class="invalid-feedback">
 									该账号不存在!
 								</div>
 							</div>
@@ -82,7 +108,7 @@
 					<div class="form-group row mt-4">
 						<div class="col-sm-2"></div>
 						<div class="col-sm-10 text-center">
-							<button type="submit" class="btn btn-info text-white form-control" onclick="test();">立即上传</button>
+							<button type="submit" class="btn btn-info text-white form-control">立即上传</button>
 						</div>
 					</div>
 				</form>
@@ -196,37 +222,12 @@
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js" crossorigin="anonymous"></script>
 	<script th:src="@{/js/global.js}"></script>
+	<script th:src="@{/js/set.js}">
 	<script>
 		$(function(){
 			bsCustomFileInput.init();
 		});
 	</script>
-	<script>
-		function test(){
-			 var selectedFile;
-			 var filename;
-	 	     selectedFile = document.getElementById('head-image').files[0];
-	 	     filename = selectedFile.name;
 
-
-			var cos = new COS({
-				SecretId: 'AKIDf7KUTDL6i41i14aPjpgZCbkjCOM3GaQv',
-				SecretKey: 'LQGrVq5Awb0A6qJhwyvnZ8RULxJCrGSs',
-			});
-		 alert("?234t5yui4j6");
-			cos.putObject({
-				Bucket: 'community-header-1252397182', /* 必须 */
-				Region: 'ap-nanjing',     /* 存储桶所在地域，必须字段 */
-				Key: filename,              /* 必须 */
-				StorageClass: 'STANDARD',
-				Body: selectedFile, // 上传文件对象
-				onProgress: function(progressData) {
-					console.log(JSON.stringify(progressData));
-				}
-			}, function(err, data) {
-				console.log(err || data);
-			});
-		}
-	</script>
 </body>
 </html>

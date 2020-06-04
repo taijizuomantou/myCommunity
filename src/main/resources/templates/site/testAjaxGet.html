@@ -46,8 +46,8 @@ function test() {
                     }
                 });
                 cos.putObject({
-                Bucket: 'community-header-1252397182', /* 必须 */
-                Region: 'ap-nanjing',     /* 存储桶所在地域，必须字段 */
+                Bucket: Bucket, /* 必须 */
+                Region: Region,     /* 存储桶所在地域，必须字段 */
                 Key: 'test2',              /* 必须 */
                 StorageClass: 'STANDARD',
                 Body: selectedFile, // 上传文件对象
